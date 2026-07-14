@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " A ",
+    "DGD",
+    "DDD"
+  ],
+  "key": {
+    "A": { "item": "minecraft:amethyst_shard" },
+    "D": { "item": "minecraft:deepslate_tiles" },
+    "G": { "item": "minecraft:gold_ingot" }
+  },
+  "result": {
+    "item": "axiomata:offering_plinth",
+    "count": 4
+  },
+  "show_notification": true
+}

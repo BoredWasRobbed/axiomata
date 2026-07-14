@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " G ",
+    "RAR",
+    " P "
+  ],
+  "key": {
+    "G": { "item": "minecraft:glow_ink_sac" },
+    "R": { "item": "minecraft:redstone" },
+    "A": { "item": "minecraft:amethyst_shard" },
+    "P": { "item": "minecraft:paper" }
+  },
+  "result": {
+    "item": "axiomata:rune_mark",
+    "count": 8
+  },
+  "show_notification": true
+}

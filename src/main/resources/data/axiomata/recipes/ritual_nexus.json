@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AEA",
+    "OCO",
+    "ARA"
+  ],
+  "key": {
+    "A": { "item": "minecraft:amethyst_shard" },
+    "E": { "item": "minecraft:ender_eye" },
+    "O": { "item": "minecraft:obsidian" },
+    "C": { "item": "minecraft:crying_obsidian" },
+    "R": { "item": "minecraft:redstone_block" }
+  },
+  "result": {
+    "item": "axiomata:ritual_nexus"
+  },
+  "show_notification": true
+}

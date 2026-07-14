@@ -1,41 +1,31 @@
 {
-	"schemaVersion": 1,
-	"id": "axiomata",
-	"version": "${version}",
-	"name": "Axiomata",
-	"description": "This is an example description! Tell everyone what your mod is about!",
-	"authors": [
-		"Me!"
-	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
-	"license": "CC0-1.0",
-	"icon": "assets/axiomata/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"net.bored.Axiomata"
-		],
-		"client": [
-			"net.bored.client.AxiomataClient"
-		],
-		"fabric-datagen": [
-			"net.bored.client.AxiomataDataGenerator"
-		]
-	},
-	"mixins": [
-		"axiomata.mixins.json",
-		{
-			"config": "axiomata.client.mixins.json",
-			"environment": "client"
-		}
-	],
-	"depends": {
-		"fabricloader": ">=0.19.3",
-		"minecraft": "~1.20.1",
-		"java": ">=17",
-		"fabric-api": "*"
-	}
+  "schemaVersion": 1,
+  "id": "axiomata",
+  "version": "${version}",
+  "name": "Axiomata",
+  "description": "Renderer-first ritual magic: inscribe geometric axioms, arrange offerings, and bend the world without custom in-world textures.",
+  "authors": [
+    "BoredWasRobbed"
+  ],
+  "contact": {
+    "sources": "https://github.com/BoredWasRobbed/axiomata",
+    "issues": "https://github.com/BoredWasRobbed/axiomata/issues"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/axiomata/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.bored.Axiomata"
+    ],
+    "client": [
+      "net.bored.client.AxiomataClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "fabric-api": "*"
+  }
 }

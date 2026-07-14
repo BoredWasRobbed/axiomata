@@ -1,0 +1,19 @@
+{
+  "block.axiomata.ritual_nexus": "Ritual Nexus",
+  "block.axiomata.offering_plinth": "Offering Plinth",
+  "block.axiomata.rune_mark": "Rune Mark",
+  "item.axiomata.resonance_tuner": "Resonance Tuner",
+  "ritual.axiomata.material_concordance": "Material Concordance",
+  "ritual.axiomata.verdant_recursion": "Verdant Recursion",
+  "ritual.axiomata.aegis_equation": "Aegis Equation",
+  "ritual.axiomata.tempest_postulate": "Tempest Postulate",
+  "ritual.axiomata.astral_translation": "Astral Translation",
+  "message.axiomata.rune_selected": "Rune set to %s",
+  "message.axiomata.ritual_complete": "%s resolves.",
+  "message.axiomata.already_active": "The nexus is already resolving an axiom.",
+  "message.axiomata.cooling": "The nexus needs %s more seconds to stabilize.",
+  "message.axiomata.structure_incomplete": "The ritual is incomplete. Check every rune and plinth.",
+  "message.axiomata.no_axiom": "No known axiom begins with the rune sequence %s.",
+  "message.axiomata.ritual_started": "%s begins to resolve...",
+  "message.axiomata.structure_hint": "Place four rune marks diagonally beside the nexus and plinths three blocks north, east, south, and west. Fill every plinth."
+}
