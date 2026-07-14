@@ -1,6 +1,7 @@
 package net.bored.client;
 
 import net.bored.client.render.AstralAnchorRenderer;
+import net.bored.client.render.AstralNodeRenderer;
 import net.bored.client.screen.AstralStorageScreen;
 import net.bored.content.ModBlockEntities;
 import net.bored.content.ModScreenHandlers;
@@ -12,6 +13,7 @@ public final class AxiomataClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         BlockEntityRendererRegistry.register(ModBlockEntities.ASTRAL_ANCHOR, AstralAnchorRenderer::new);
+        BlockEntityRendererRegistry.register(ModBlockEntities.ASTRAL_NODE, AstralNodeRenderer::new);
         HandledScreens.register(ModScreenHandlers.ASTRAL_STORAGE, AstralStorageScreen::new);
     }
 }

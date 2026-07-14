@@ -1,0 +1,18 @@
+{
+  "parent": "axiomata:catch_starlight",
+  "display": {
+    "icon": { "item": "axiomata:astral_cell" },
+    "title": { "translate": "advancement.axiomata.cell.title" },
+    "description": { "translate": "advancement.axiomata.cell.description" },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "cell": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": { "items": [{ "items": ["axiomata:astral_cell"] }] }
+    }
+  }
+}

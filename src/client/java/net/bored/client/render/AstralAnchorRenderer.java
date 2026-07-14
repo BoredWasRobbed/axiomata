@@ -9,8 +9,6 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
 
-import java.util.Random;
-
 public final class AstralAnchorRenderer implements BlockEntityRenderer<AstralAnchorBlockEntity> {
     public AstralAnchorRenderer(BlockEntityRendererFactory.Context context) {
     }
@@ -19,149 +17,128 @@ public final class AstralAnchorRenderer implements BlockEntityRenderer<AstralAnc
     public void render(AstralAnchorBlockEntity anchor, float tickDelta, MatrixStack matrices,
                        VertexConsumerProvider consumers, int light, int overlay) {
         float time = (anchor.getWorld() == null ? 0 : anchor.getWorld().getTime()) + tickDelta;
-        float activity = anchor.getActivity(tickDelta);
-        float fill = anchor.getFillRatio();
         int color = anchor.getNetworkColor();
-        int bright = mix(color, 0xFFFFFF, 0.46f);
+        int bright = mix(color, 0xFFFFFF, 0.55f);
+        int dormant = mix(color, 0x241D35, 0.72f);
+        VertexConsumer surfaces = consumers.getBuffer(RenderLayer.getLightning());
         VertexConsumer lines = consumers.getBuffer(RenderLayer.getLines());
 
         matrices.push();
         matrices.translate(0.5, 0.03, 0.5);
-
-        renderBase(lines, matrices, time, fill, color, bright);
-        renderAperture(lines, matrices, time, activity, fill, color, bright);
-        renderCapacityCells(lines, matrices, time, anchor.getPageCount(), color, bright);
-        renderConstellation(lines, matrices, time, anchor.getVisualSeed(), color, bright);
-        if (activity > 0.0f) {
-            renderTransfers(lines, matrices, time, activity, color, bright);
+        renderPedestal(surfaces, lines, matrices, time, anchor, color, bright, dormant);
+        if (anchor.isOperational()) {
+            renderOpenIris(surfaces, lines, matrices, time, anchor, color, bright);
+            renderCapacityCells(surfaces, matrices, time, anchor.getPageCount(), color, bright);
+            renderMatterFlares(surfaces, matrices, time, anchor.getActivity(tickDelta), bright);
+        } else {
+            renderDormantIris(surfaces, matrices, time, anchor.isFrameComplete(), dormant, color);
         }
-
         matrices.pop();
     }
 
-    private static void renderBase(VertexConsumer lines, MatrixStack matrices, float time, float fill,
-                                   int color, int bright) {
-        RenderPrimitives.circle(lines, matrices.peek(), 0, 0.02f, 0, 0.62f, 8, 0x3C2B62, 240);
-        RenderPrimitives.circle(lines, matrices.peek(), 0, 0.11f, 0, 0.5f, 32, color, 190);
-        RenderPrimitives.circle(lines, matrices.peek(), 0, 0.15f, 0, 0.34f, 24, bright, 150);
-        RenderPrimitives.arc(lines, matrices.peek(), 0, 0.17f, 0, 0.55f, 64,
-                (time * 0.002f) % 1.0f, Math.max(0.025f, fill), bright, 245);
-        RenderPrimitives.box(lines, matrices.peek(), -0.38f, 0.0f, -0.38f,
-                0.38f, 0.24f, 0.38f, 0x4C3A71, 210);
-        for (int i = 0; i < 8; i++) {
-            double angle = i * Math.PI / 4.0;
-            RenderPrimitives.line(lines, matrices.peek(),
-                    (float) Math.cos(angle) * 0.34f, 0.15f, (float) Math.sin(angle) * 0.34f,
-                    (float) Math.cos(angle) * 0.62f, 0.02f, (float) Math.sin(angle) * 0.62f,
-                    color, 150);
+    private static void renderPedestal(VertexConsumer surfaces, VertexConsumer lines, MatrixStack matrices,
+                                       float time, AstralAnchorBlockEntity anchor, int color, int bright,
+                                       int dormant) {
+        int activeColor = anchor.isOperational() ? color : dormant;
+        RenderSurfaces.discXZ(surfaces, matrices.peek(), 0.025f, 0.55f, 12, 0x171020, 235);
+        RenderSurfaces.ringXZ(surfaces, matrices.peek(), 0.045f, 0.34f, 0.54f, 16, activeColor, 125);
+        RenderSurfaces.ringXZ(surfaces, matrices.peek(), 0.065f, 0.47f,
+                0.47f + anchor.getEnergyRatio() * 0.07f, 24, bright, anchor.isOperational() ? 185 : 35);
+        for (int i = 0; i < 4; i++) {
+            double angle = i * Math.PI / 2.0;
+            int dx = (int) Math.round(Math.cos(angle));
+            int dz = (int) Math.round(Math.sin(angle));
+            RenderSurfaces.cardinalRibbon(surfaces, matrices.peek(), 0.075f, dx, dz,
+                    0.30f, 0.72f, 0.055f, activeColor, anchor.isOperational() ? 175 : 52);
+        }
+        if (anchor.isOperational()) {
+            RenderPrimitives.arc(lines, matrices.peek(), 0, 0.085f, 0, 0.58f, 48,
+                    (time * 0.002f) % 1.0f, Math.max(0.035f, anchor.getFillRatio()), bright, 235);
         }
     }
 
-    private static void renderAperture(VertexConsumer lines, MatrixStack matrices, float time, float activity,
-                                       float fill, int color, int bright) {
+    private static void renderOpenIris(VertexConsumer surfaces, VertexConsumer lines, MatrixStack matrices,
+                                       float time, AstralAnchorBlockEntity anchor, int color, int bright) {
+        float breath = 1.0f + (float) Math.sin(time * 0.045f) * 0.035f;
         matrices.push();
-        matrices.translate(0, 0.88, 0);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(time * 0.22f));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90.0f));
-        float breath = 1.0f + (float) Math.sin(time * 0.055f) * 0.035f + activity * 0.08f;
-        RenderPrimitives.circle(lines, matrices.peek(), 0, 0, 0, 0.62f * breath, 72, bright, 235);
-        RenderPrimitives.circle(lines, matrices.peek(), 0, 0.012f, 0, 0.51f * breath, 64, color, 210);
-        RenderPrimitives.circle(lines, matrices.peek(), 0, -0.012f, 0, 0.39f * breath, 48, bright, 145);
-        RenderPrimitives.arc(lines, matrices.peek(), 0, 0.025f, 0, 0.565f * breath, 72,
-                (-time * 0.004f) % 1.0f, Math.max(0.04f, fill), 0xFFFFFF, 255);
-        for (int i = 0; i < 12; i++) {
-            double angle = i * Math.PI / 6.0 + time * 0.006;
-            float inner = 0.39f * breath;
-            float outer = 0.51f * breath;
-            RenderPrimitives.line(lines, matrices.peek(),
-                    (float) Math.cos(angle) * inner, 0, (float) Math.sin(angle) * inner,
-                    (float) Math.cos(angle) * outer, 0, (float) Math.sin(angle) * outer,
-                    color, 155);
+        matrices.translate(0, 0.91, 0);
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(time * 0.28f));
+        RenderSurfaces.discXY(surfaces, matrices.peek(), 0, 0.39f * breath, 24,
+                mix(color, 0x090617, 0.48f), 138);
+        RenderSurfaces.ringXY(surfaces, matrices.peek(), 0.006f, 0.40f * breath, 0.55f * breath,
+                32, color, 155);
+        RenderSurfaces.ringXY(surfaces, matrices.peek(), -0.006f, 0.515f * breath, 0.57f * breath,
+                32, bright, 210);
+        for (int i = 0; i < 7; i++) {
+            matrices.push();
+            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(i * (360.0f / 7.0f) - time * 0.16f));
+            float sweep = 0.055f + 0.018f * (float) Math.sin(time * 0.06f + i);
+            RenderSurfaces.petalXY(surfaces, matrices.peek(), 0.12f, 0.50f, 0.105f, sweep,
+                    i % 2 == 0 ? bright : color, 118);
+            matrices.pop();
         }
+        RenderSurfaces.diamond(surfaces, matrices.peek(), 0, 0, 0.025f, 0.105f,
+                0.18f + anchor.getActivity(0) * 0.06f, 0xFFFFFF, 230);
         matrices.pop();
 
         matrices.push();
-        matrices.translate(0, 0.88, 0);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-time * 0.7f));
-        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(64.0f));
-        RenderPrimitives.circle(lines, matrices.peek(), 0, 0, 0, 0.72f + activity * 0.08f, 64,
-                color, 175);
-        matrices.pop();
-
-        matrices.push();
-        matrices.translate(0, 0.88, 0);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(time * 0.95f));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(58.0f));
-        RenderPrimitives.circle(lines, matrices.peek(), 0, 0, 0, 0.77f + activity * 0.05f, 64,
-                bright, 140);
+        matrices.translate(0, 0.91, 0);
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-time * 0.48f));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(62.0f));
+        RenderPrimitives.circle(lines, matrices.peek(), 0, 0, 0, 0.69f, 56, color, 125);
         matrices.pop();
     }
 
-    private static void renderCapacityCells(VertexConsumer lines, MatrixStack matrices, float time, int pages,
-                                            int color, int bright) {
+    private static void renderDormantIris(VertexConsumer surfaces, MatrixStack matrices, float time,
+                                          boolean frameComplete, int dormant, int color) {
+        matrices.push();
+        matrices.translate(0, 0.72, 0);
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(time * 0.08f));
+        int alpha = frameComplete ? 95 : 48;
+        RenderSurfaces.diamond(surfaces, matrices.peek(), 0, 0, 0, 0.22f, 0.44f,
+                frameComplete ? color : dormant, alpha);
+        for (int i = 0; i < 4; i++) {
+            matrices.push();
+            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(i * 90.0f + 45.0f));
+            RenderSurfaces.petalXY(surfaces, matrices.peek(), 0.08f, 0.38f, 0.07f, 0.02f,
+                    dormant, alpha);
+            matrices.pop();
+        }
+        matrices.pop();
+    }
+
+    private static void renderCapacityCells(VertexConsumer surfaces, MatrixStack matrices, float time,
+                                            int pages, int color, int bright) {
         for (int i = 0; i < pages; i++) {
-            double angle = time * (0.018 + i * 0.0018) + i * Math.PI * 2.0 / pages;
-            float radius = 0.92f + i * 0.055f;
+            double angle = time * 0.014 + i * Math.PI * 2.0 / pages;
+            float radius = 0.76f;
             float x = (float) Math.cos(angle) * radius;
             float z = (float) Math.sin(angle) * radius;
-            float y = 0.77f + (float) Math.sin(angle * 1.7) * 0.22f;
-            RenderPrimitives.diamond(lines, matrices.peek(), x, y, z, 0.09f, 0.16f,
-                    i == pages - 1 ? bright : color, 230);
-            RenderPrimitives.line(lines, matrices.peek(), x, y, z, 0, 0.88f, 0, color, 70);
+            float y = 0.73f + (float) Math.sin(angle * 2.0) * 0.12f;
+            RenderSurfaces.diamond(surfaces, matrices.peek(), x, y, z, 0.065f, 0.13f,
+                    i == pages - 1 ? bright : color, 185);
         }
     }
 
-    private static void renderConstellation(VertexConsumer lines, MatrixStack matrices, float time, long seed,
-                                            int color, int bright) {
-        Random random = new Random(seed);
-        float[][] stars = new float[14][3];
-        for (int i = 0; i < stars.length; i++) {
-            double angle = random.nextDouble() * Math.PI * 2.0;
-            float radius = 0.78f + random.nextFloat() * 0.68f;
-            stars[i][0] = (float) Math.cos(angle) * radius;
-            stars[i][1] = 0.45f + random.nextFloat() * 1.25f;
-            stars[i][2] = (float) Math.sin(angle) * radius;
-            float pulse = 0.018f + 0.012f * (0.5f + 0.5f * (float) Math.sin(time * 0.08f + i));
-            RenderPrimitives.star(lines, matrices.peek(), stars[i][0], stars[i][1], stars[i][2],
-                    pulse, i % 3 == 0 ? bright : color, 150 + i % 4 * 20);
+    private static void renderMatterFlares(VertexConsumer surfaces, MatrixStack matrices, float time,
+                                           float activity, int bright) {
+        if (activity <= 0.0f) {
+            return;
         }
-        for (int i = 0; i < stars.length; i++) {
-            int next = (i * 5 + 3) % stars.length;
-            if (i == next) {
-                continue;
-            }
-            RenderPrimitives.line(lines, matrices.peek(), stars[i][0], stars[i][1], stars[i][2],
-                    stars[next][0], stars[next][1], stars[next][2], color, 46);
+        for (int i = 0; i < 3; i++) {
+            float progress = (time * 0.025f + i / 3.0f) % 1.0f;
+            double angle = i * Math.PI * 2.0 / 3.0 + time * 0.018;
+            float radius = 1.15f * (1.0f - progress);
+            float x = (float) Math.cos(angle) * radius;
+            float z = (float) Math.sin(angle) * radius;
+            float y = 0.28f + progress * 0.62f + (float) Math.sin(progress * Math.PI) * 0.42f;
+            RenderSurfaces.diamond(surfaces, matrices.peek(), x, y, z,
+                    0.025f + activity * 0.025f, 0.07f + activity * 0.06f, bright,
+                    (int) (90 + activity * 150));
         }
     }
 
-    private static void renderTransfers(VertexConsumer lines, MatrixStack matrices, float time, float activity,
-                                        int color, int bright) {
-        for (int i = 0; i < 6; i++) {
-            double angle = i * Math.PI / 3.0;
-            float startX = (float) Math.cos(angle) * 1.25f;
-            float startZ = (float) Math.sin(angle) * 1.25f;
-            RenderPrimitives.bezier(lines, matrices.peek(), startX, 0.25f, startZ,
-                    startX * 0.75f, 1.45f, startZ * 0.75f,
-                    -startZ * 0.25f, 1.3f, startX * 0.25f,
-                    0, 0.88f, 0, 18, color, (int) (40 + activity * 80));
-            float t = (time * 0.03f + i * 0.17f) % 1.0f;
-            float inverse = 1.0f - t;
-            float x = inverse * inverse * inverse * startX
-                    + 3 * inverse * inverse * t * startX * 0.75f
-                    + 3 * inverse * t * t * (-startZ * 0.25f);
-            float y = inverse * inverse * inverse * 0.25f
-                    + 3 * inverse * inverse * t * 1.45f
-                    + 3 * inverse * t * t * 1.3f + t * t * t * 0.88f;
-            float z = inverse * inverse * inverse * startZ
-                    + 3 * inverse * inverse * t * startZ * 0.75f
-                    + 3 * inverse * t * t * (startX * 0.25f);
-            RenderPrimitives.star(lines, matrices.peek(), x, y, z, 0.045f + activity * 0.02f,
-                    bright, 255);
-        }
-    }
-
-    private static int mix(int first, int second, float amount) {
+    static int mix(int first, int second, float amount) {
         int red = (int) ((first >> 16 & 255) * (1.0f - amount) + (second >> 16 & 255) * amount);
         int green = (int) ((first >> 8 & 255) * (1.0f - amount) + (second >> 8 & 255) * amount);
         int blue = (int) ((first & 255) * (1.0f - amount) + (second & 255) * amount);

@@ -4,14 +4,14 @@
   "pattern": [
     "AEA",
     "SCS",
-    "AOA"
+    "ATA"
   ],
   "key": {
     "A": { "item": "minecraft:amethyst_shard" },
     "E": { "item": "minecraft:echo_shard" },
     "S": { "item": "minecraft:shulker_shell" },
     "C": { "item": "minecraft:end_crystal" },
-    "O": { "item": "minecraft:obsidian" }
+    "T": { "item": "axiomata:astral_thread" }
   },
   "result": {
     "item": "axiomata:astral_cell"

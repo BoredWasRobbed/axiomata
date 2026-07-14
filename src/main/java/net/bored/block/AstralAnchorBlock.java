@@ -5,6 +5,7 @@ import net.bored.content.ModBlockEntities;
 import net.bored.content.ModItems;
 import net.bored.item.AstralKeyItem;
 import net.bored.storage.AstralColors;
+import net.bored.storage.AstralPower;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -15,6 +16,7 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -28,7 +30,9 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.UUID;
 
 public final class AstralAnchorBlock extends BlockWithEntity {
@@ -69,7 +73,19 @@ public final class AstralAnchorBlock extends BlockWithEntity {
             return ActionResult.CONSUME;
         }
 
+        if (!anchor.prepareInteraction()) {
+            player.sendMessage(anchor.getRitualStatus().copy().formatted(Formatting.LIGHT_PURPLE), true);
+            world.playSound(null, pos, SoundEvents.BLOCK_AMETHYST_BLOCK_HIT,
+                    SoundCategory.BLOCKS, 0.7f, 0.62f);
+            return ActionResult.CONSUME;
+        }
+
         if (held.isOf(ModItems.ASTRAL_KEY)) {
+            if (!anchor.consumeResonance(AstralPower.ANCHOR_OPEN_COST)) {
+                player.sendMessage(Text.translatable("message.axiomata.resonance_low",
+                        AstralPower.ANCHOR_OPEN_COST).formatted(Formatting.GRAY), true);
+                return ActionResult.CONSUME;
+            }
             UUID anchorNetwork = anchor.ensureNetwork();
             if (player.isSneaking() && AstralKeyItem.hasNetwork(held)) {
                 UUID keyNetwork = AstralKeyItem.getNetwork(held);
@@ -98,13 +114,19 @@ public final class AstralAnchorBlock extends BlockWithEntity {
                 world.playSound(null, pos, SoundEvents.BLOCK_END_PORTAL_FRAME_FILL,
                         SoundCategory.BLOCKS, 1.1f, 0.8f + after * 0.12f);
             } else {
-                player.sendMessage(Text.translatable("message.axiomata.capacity_max")
-                        .formatted(Formatting.GRAY), true);
+                Text failure = after == 0
+                        ? Text.translatable("message.axiomata.capacity_max")
+                        : Text.translatable("message.axiomata.resonance_low", AstralPower.CELL_UPGRADE_COST);
+                player.sendMessage(failure.copy().formatted(Formatting.GRAY), true);
             }
             return ActionResult.CONSUME;
         }
 
-        anchor.markAccess();
+        if (!anchor.consumeResonance(AstralPower.ANCHOR_OPEN_COST)) {
+            player.sendMessage(Text.translatable("message.axiomata.resonance_low",
+                    AstralPower.ANCHOR_OPEN_COST).formatted(Formatting.GRAY), true);
+            return ActionResult.CONSUME;
+        }
         serverPlayer.openHandledScreen(anchor);
         world.playSound(null, pos, SoundEvents.BLOCK_ENDER_CHEST_OPEN,
                 SoundCategory.BLOCKS, 0.8f, 1.25f);
@@ -120,6 +142,13 @@ public final class AstralAnchorBlock extends BlockWithEntity {
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
         return world.getBlockEntity(pos) instanceof AstralAnchorBlockEntity anchor
                 ? anchor.getComparatorOutput() : 0;
+    }
+
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable BlockView world, List<Text> tooltip,
+                              TooltipContext options) {
+        tooltip.add(Text.translatable("tooltip.axiomata.anchor_ritual").formatted(Formatting.LIGHT_PURPLE));
+        tooltip.add(Text.translatable("tooltip.axiomata.anchor_frame").formatted(Formatting.GRAY));
     }
 
     @Override

@@ -1,0 +1,18 @@
+{
+  "parent": "axiomata:weave_the_void",
+  "display": {
+    "icon": { "item": "axiomata:resonance_pylon" },
+    "title": { "translate": "advancement.axiomata.frame.title" },
+    "description": { "translate": "advancement.axiomata.frame.description" },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "anchor": { "trigger": "minecraft:inventory_changed", "conditions": { "items": [{ "items": ["axiomata:astral_anchor"] }] } },
+    "conduits": { "trigger": "minecraft:inventory_changed", "conditions": { "items": [{ "items": ["axiomata:ley_conduit"], "count": { "min": 8 } }] } },
+    "pylons": { "trigger": "minecraft:inventory_changed", "conditions": { "items": [{ "items": ["axiomata:resonance_pylon"], "count": { "min": 4 } }] } }
+  },
+  "requirements": [["anchor"], ["conduits"], ["pylons"]]
+}

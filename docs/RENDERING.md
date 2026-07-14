@@ -1,27 +1,27 @@
 # Renderer architecture
 
-Axiomata has no custom in-world texture atlas entries and no baked world geometry. Both the placed anchor and its storage interface are composed at runtime.
+Axiomata has no custom in-world atlas textures or baked block geometry. Placed components use invisible block states with ordinary collision shapes, while block-entity renderers construct the visible machine at runtime.
 
-## Astral Anchor
+## Filled procedural forms
 
-`RenderPrimitives` emits colored line pairs into Minecraft's line render layer. It provides segments, full and partial circles, wire boxes, octahedral storage cells, three-axis stars, and cubic Bézier paths.
+`RenderSurfaces` emits double-sided translucent quads into Minecraft's lightning render layer. It builds discs, annuli, iris petals, cardinal ribbons, and faceted diamonds. `RenderPrimitives` remains available for a small number of fine halo and progress accents, but lines are no longer the dominant visual material.
 
-`AstralAnchorRenderer` composes those primitives into several stateful layers:
+`AstralAnchorRenderer` changes composition according to synchronized ritual state:
 
-- an octagonal physical base, radial braces, counter-rotating circles, and an occupancy arc;
-- a vertical astral aperture with three breathing rings, twelve radial gates, and a separate pair of tilted armillary rings;
-- one orbiting octahedral cell per unlocked 54-slot page;
-- fourteen deterministic stars derived from the archive UUID, connected into a faint constellation canopy;
-- six cubic transfer filaments and moving three-axis motes that appear after archive access.
+- an incomplete frame displays a compact dormant crystal;
+- a complete but unpowered frame displays a closed iris;
+- an operational network opens a breathing, seven-petal membrane with a solid white core;
+- four short pedestal ribbons show that the cardinal ritual arms are energized;
+- one faceted crystal orbits for every unlocked archive page;
+- three solid-light matter flares appear briefly after access;
+- a single fine occupancy arc remains as a restrained information accent.
 
-Archive identity generates the palette and constellation seed. Capacity, occupied-slot ratio, and the last-access timestamp are synchronized display metrics, so visual changes describe actual storage state.
+`AstralNodeRenderer` gives the construction blocks separate silhouettes. Conduits use filled connection ribbons, pylons use levitating nested prisms, and collectors use a twelve-segment dish, crossed sky beam, and descending light droplet. Vanilla reverse-portal and end-rod particles add sparse motion without custom particle textures.
 
-## Astral Archive screen
+## Archive screen
 
-`AstralStorageScreen` extends `HandledScreen` but never samples a GUI texture. It draws panels, borders, 90 slot wells, stars, dotted constellation paths, page markers, labels, and shadows with `DrawContext` primitives.
+`AstralStorageScreen` never samples a GUI texture. `DrawContext` primitives create cut-corner panels, deep slot wells, filled diamond page marks, and a synchronized resonance meter. The old star field and dotted constellation web were removed to protect item readability.
 
-The screen color comes from the same archive UUID as the anchor. The footer also states whether the access path is an anchor or portable key and prints the short constellation code.
+## Synchronization cost
 
-## Network cost
-
-The anchor updates occupancy metrics every ten server ticks and sends block-entity updates only when those metrics change. Last-access time is sent as a timestamp, letting the client animate locally without a countdown packet every tick. Screen contents use vanilla `ScreenHandler` slot synchronization.
+Anchors scan once per second and only synchronize when ritual, power, capacity, or occupancy display state changes. Nodes receive a timestamped pulse; they synchronize when activation, color, or strength changes and expire locally after the heartbeat stops. Continuous rotation, breathing, orbiting, and particle positions are derived from world time on the client.

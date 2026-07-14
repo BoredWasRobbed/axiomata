@@ -1,20 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "pattern": [
-    "ATA",
-    "OCO",
-    "ARA"
-  ],
+  "pattern": [" A ", "ATA", "OCO"],
   "key": {
     "A": { "item": "minecraft:amethyst_shard" },
     "T": { "item": "axiomata:astral_thread" },
     "O": { "item": "minecraft:obsidian" },
-    "C": { "item": "minecraft:ender_chest" },
-    "R": { "item": "minecraft:crying_obsidian" }
+    "C": { "item": "minecraft:crying_obsidian" }
   },
-  "result": {
-    "item": "axiomata:astral_anchor"
-  },
+  "result": { "item": "axiomata:resonance_pylon" },
   "show_notification": true
 }

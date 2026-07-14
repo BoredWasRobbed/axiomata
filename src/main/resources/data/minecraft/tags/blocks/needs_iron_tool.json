@@ -1,6 +1,8 @@
 {
   "replace": false,
   "values": [
-    "axiomata:astral_anchor"
+    "axiomata:astral_anchor",
+    "axiomata:resonance_pylon",
+    "axiomata:starlight_collector"
   ]
 }

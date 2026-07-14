@@ -3,6 +3,7 @@ package net.bored.item;
 import net.bored.screen.AstralStorageScreenHandler;
 import net.bored.storage.AstralColors;
 import net.bored.storage.AstralInventory;
+import net.bored.storage.AstralPower;
 import net.bored.storage.AstralStorageState;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.client.item.TooltipContext;
@@ -56,6 +57,17 @@ public final class AstralKeyItem extends Item {
             UUID networkId = getNetwork(stack);
             AstralStorageState storage = AstralStorageState.get(serverWorld);
             storage.ensureVault(networkId);
+            long time = AstralPower.networkTime(serverWorld);
+            if (!storage.isOnline(networkId, time)) {
+                user.sendMessage(Text.translatable("message.axiomata.network_offline")
+                        .formatted(Formatting.GRAY), true);
+                return TypedActionResult.success(stack, false);
+            }
+            if (!storage.consume(networkId, AstralPower.KEY_OPEN_COST, time)) {
+                user.sendMessage(Text.translatable("message.axiomata.resonance_low",
+                        AstralPower.KEY_OPEN_COST).formatted(Formatting.GRAY), true);
+                return TypedActionResult.success(stack, false);
+            }
             serverPlayer.openHandledScreen(new PortableFactory(serverWorld, networkId));
         }
         return TypedActionResult.success(stack, world.isClient);
@@ -73,6 +85,8 @@ public final class AstralKeyItem extends Item {
             tooltip.add(Text.translatable("tooltip.axiomata.key_network",
                     AstralColors.shortId(getNetwork(stack))).formatted(Formatting.LIGHT_PURPLE));
             tooltip.add(Text.translatable("tooltip.axiomata.key_use").formatted(Formatting.GRAY));
+            tooltip.add(Text.translatable("tooltip.axiomata.key_cost",
+                    AstralPower.KEY_OPEN_COST).formatted(Formatting.DARK_AQUA));
         } else {
             tooltip.add(Text.translatable("tooltip.axiomata.key_unbound").formatted(Formatting.DARK_GRAY));
         }
@@ -124,7 +138,7 @@ public final class AstralKeyItem extends Item {
             AstralStorageState storage = AstralStorageState.get(world);
             return new AstralStorageScreenHandler(syncId, playerInventory,
                     new AstralInventory(storage, networkId), networkId, storage.getPages(networkId),
-                    ScreenHandlerContext.EMPTY, true);
+                    ScreenHandlerContext.EMPTY, true, storage, world);
         }
     }
 }

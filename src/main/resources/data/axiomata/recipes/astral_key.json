@@ -3,13 +3,14 @@
   "category": "equipment",
   "pattern": [
     " AE",
-    " BR",
+    " TR",
     "B  "
   ],
   "key": {
     "A": { "item": "minecraft:amethyst_shard" },
     "E": { "item": "minecraft:echo_shard" },
     "B": { "item": "minecraft:blaze_rod" },
+    "T": { "item": "axiomata:astral_thread" },
     "R": { "item": "minecraft:recovery_compass" }
   },
   "result": {

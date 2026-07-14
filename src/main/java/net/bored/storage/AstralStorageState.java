@@ -38,6 +38,10 @@ public final class AstralStorageState extends PersistentState {
             UUID id = vaultNbt.getUuid("Id");
             VaultData data = new VaultData();
             data.pages = AstralCapacity.normalizePages(vaultNbt.getInt("Pages"));
+            data.energy = Math.max(0, Math.min(AstralPower.capacityForPages(data.pages),
+                    vaultNbt.getInt("Energy")));
+            data.lastOnline = vaultNbt.contains("LastOnline")
+                    ? vaultNbt.getLong("LastOnline") : Long.MIN_VALUE;
             Inventories.readNbt(vaultNbt, data.stacks);
             state.vaults.put(id, data);
         }
@@ -51,6 +55,8 @@ public final class AstralStorageState extends PersistentState {
             NbtCompound vaultNbt = new NbtCompound();
             vaultNbt.putUuid("Id", entry.getKey());
             vaultNbt.putInt("Pages", entry.getValue().pages);
+            vaultNbt.putInt("Energy", entry.getValue().energy);
+            vaultNbt.putLong("LastOnline", entry.getValue().lastOnline);
             Inventories.writeNbt(vaultNbt, entry.getValue().stacks);
             vaultList.add(vaultNbt);
         }
@@ -86,6 +92,45 @@ public final class AstralStorageState extends PersistentState {
         return data.pages;
     }
 
+    public int charge(UUID id, int amount, long time) {
+        ensureVault(id);
+        VaultData data = vaults.get(id);
+        int before = data.energy;
+        data.energy = Math.min(AstralPower.capacityForPages(data.pages), data.energy + Math.max(0, amount));
+        data.lastOnline = time;
+        if (data.energy != before || amount > 0) {
+            markDirty();
+        }
+        return data.energy;
+    }
+
+    public boolean consume(UUID id, int amount, long time) {
+        ensureVault(id);
+        VaultData data = vaults.get(id);
+        if (!isOnline(id, time) || amount < 0 || data.energy < amount) {
+            return false;
+        }
+        data.energy -= amount;
+        markDirty();
+        return true;
+    }
+
+    public boolean isOnline(UUID id, long time) {
+        ensureVault(id);
+        long lastOnline = vaults.get(id).lastOnline;
+        return lastOnline != Long.MIN_VALUE && time >= lastOnline
+                && time - lastOnline <= AstralPower.ONLINE_GRACE_TICKS;
+    }
+
+    public int getEnergy(UUID id) {
+        ensureVault(id);
+        return vaults.get(id).energy;
+    }
+
+    public int getMaxEnergy(UUID id) {
+        return AstralPower.capacityForPages(getPages(id));
+    }
+
     public int countUsedSlots(UUID id) {
         ensureVault(id);
         int used = 0;
@@ -101,5 +146,7 @@ public final class AstralStorageState extends PersistentState {
     private static final class VaultData {
         private final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(MAX_SLOTS, ItemStack.EMPTY);
         private int pages = 1;
+        private int energy;
+        private long lastOnline = Long.MIN_VALUE;
     }
 }

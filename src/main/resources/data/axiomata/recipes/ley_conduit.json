@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": ["ATA", " O "],
+  "key": {
+    "A": { "item": "minecraft:amethyst_shard" },
+    "T": { "item": "axiomata:astral_thread" },
+    "O": { "item": "minecraft:obsidian" }
+  },
+  "result": { "item": "axiomata:ley_conduit", "count": 4 },
+  "show_notification": true
+}

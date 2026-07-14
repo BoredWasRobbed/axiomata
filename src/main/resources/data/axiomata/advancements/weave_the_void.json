@@ -1,0 +1,18 @@
+{
+  "display": {
+    "icon": { "item": "axiomata:astral_thread" },
+    "title": { "translate": "advancement.axiomata.weave.title" },
+    "description": { "translate": "advancement.axiomata.weave.description" },
+    "background": "minecraft:textures/block/obsidian.png",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "thread": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": { "items": [{ "items": ["axiomata:astral_thread"] }] }
+    }
+  }
+}

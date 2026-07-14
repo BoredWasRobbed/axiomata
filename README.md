@@ -1,8 +1,8 @@
 # Axiomata
 
-Axiomata is a renderer-first storage mod for Fabric 1.20.1. It treats storage as a place rather than a container: every archive is a persistent constellation in the astral plane, and physical anchors are only doors into it.
+Axiomata is a ritual-engineering storage mod for Fabric 1.20.1. Matter is archived in persistent vaults in the astral plane, but reaching those vaults requires a physical, powered network in the world.
 
-There are no custom in-world textures or authored block models. The anchor, its aperture, and the archive interface are assembled at runtime from procedural geometry and UI primitives. Inventory icons reuse vanilla item models; the PNG is only the mod-list icon.
+Every placed machine is drawn at runtime from procedural geometry. There are no custom in-world textures or authored block models; the inventory icons alias vanilla item models and the PNG is only the mod-list icon.
 
 ## Requirements
 
@@ -11,53 +11,69 @@ There are no custom in-world textures or authored block models. The anchor, its 
 - Fabric API 0.92.9+1.20.1
 - Java 17 to play
 
-## The storage loop
+## Ritual progression
 
-1. Craft and place an **Astral Anchor**. It creates a new archive with 54 slots.
-2. Right-click the anchor to open its textureless, paged interface. Shift-clicking works in both directions.
-3. Use an **Astral Cell** on the anchor to permanently unfold one more 54-slot page. Each network supports four pages, or 216 slots total.
-4. Use an **Astral Key** on the anchor to attune it. Right-click the key anywhere—even in another dimension—to open the same archive.
-5. Break, move, or replace the anchor freely. Its contents remain in world-level astral storage rather than dropping or disappearing.
+1. Weave **Astral Thread** from string, amethyst, and an ender pearl. It is the common magical conductor for the rest of the network.
+2. Craft an **Astral Anchor**, eight **Ley Conduits**, four **Resonance Pylons**, and a **Starlight Collector**.
+3. Place the four pylons exactly three blocks north, east, south, and west of the anchor. Fill both intervening spaces on every arm with conduits.
+4. Branch conduits from any ritual arm to a collector. The collector must have open sky directly above it.
+5. Wait for the collector to charge the archive, then use the anchor. Right-click diagnostics identify the next missing ritual step.
+6. Spend charged resonance on **Astral Cells** to unfold three additional 54-slot pages, and attune an **Astral Key** for remote and cross-dimensional access.
 
-## Linking anchors and keys
+The required frame, viewed from above, is:
 
-- Use a key normally on an anchor to copy that anchor's constellation into the key.
-- Sneak-use an attuned key on an anchor to rebind the anchor to the key's archive.
-- Right-click with an attuned key in the air to open its archive remotely.
-- Sneak-right-click with the key in the air to erase its attunement.
+```text
+      P
+      C
+      C
+P C C A C C P
+      C
+      C
+      P
 
-Multiple anchors and keys can point at the same archive. Each archive has a short constellation code in the interface and key tooltip, making it possible to verify links without exposing the full UUID.
+A = Astral Anchor   C = Ley Conduit   P = Resonance Pylon
+```
+
+The collector may sit beside any connected conduit or at the end of a longer conduit branch. Conduit routing can travel vertically and up to 32 blocks from the anchor.
+
+## Resonance and access
+
+- One sky-facing collector produces 5 resonance per second by day and 24 at night. Rain and thunderstorms add bonuses.
+- Opening at the anchor costs 5 resonance. Opening with a key costs 20.
+- Any inventory action that moves matter into or out of the archive costs 1 resonance.
+- Applying an Astral Cell costs 250 resonance.
+- Base energy capacity is 1,200. Each extra archive page adds 600, reaching 3,000 at 216 slots.
+- Breaking the frame, blocking every collector's sky, or unloading every valid ritual takes the network offline. Open screens close and remote keys stop working.
+
+## Linking and persistence
+
+- Use a key on a working anchor to copy that archive's constellation into the key.
+- Sneak-use an attuned key on a working anchor to rebind the anchor to the key's archive.
+- Use an attuned key in the air to open the archive remotely; sneak-use it to erase the attunement.
+- Multiple completed anchors may point at the same archive. Any of them can keep it powered.
+- Items and power are saved in Overworld persistent state, not in blocks. Breaking an anchor never drops or deletes archived contents.
 
 ## Visual language
 
-The anchor communicates real state instead of playing a fixed animation:
+Each network role has a distinct, state-driven silhouette:
 
-- archive identity determines its color and deterministic constellation;
-- the bright base arc shows occupied-slot ratio;
-- one orbiting crystal appears for every unlocked page;
-- access wakes six transfer filaments and moving matter motes;
-- the aperture breathes, counter-rotates, and gains intensity while active;
-- a textureless inventory screen uses the same network color, constellation, and page indicators.
+- the anchor opens as a filled seven-petal astral iris with orbiting capacity crystals;
+- conduits carry broad luminous ribbons and a traveling solid-light core;
+- pylons levitate faceted prisms and orbiting resonance shards;
+- collectors rotate a petaled sky dish and pull down falling star droplets;
+- the archive interface uses clean cut-corner fields and a live resonance bar instead of a dense constellation overlay.
 
-See [docs/RENDERING.md](docs/RENDERING.md) for the renderer breakdown and [docs/STORAGE.md](docs/STORAGE.md) for persistence and linking internals.
-
-## Persistence guarantees
-
-- Storage is saved once per world in `axiomata_astral_storage` persistent state.
-- The Overworld owns the data, so access remains consistent across dimensions.
-- Block entities save only their network link and display metrics—not item contents.
-- Removing the last known anchor does not garbage-collect an archive. An attuned key can always recover it.
-- Capacity only increases. Cells cannot strand items by shrinking a vault.
+See [docs/RENDERING.md](docs/RENDERING.md) and [docs/STORAGE.md](docs/STORAGE.md) for implementation details.
 
 ## Development
 
-The current Loom plugin uses Java 21 as its build runtime while producing Java 17-compatible mod bytecode:
+The Loom build runs on Java 21 and emits Java 17-compatible bytecode:
 
 ```bash
 ./gradlew build
 ```
 
-The distributable is generated at `build/libs/axiomata-0.2.0.jar`.
+The distributable is generated at `build/libs/axiomata-0.3.0.jar`.
 
 ## License
 

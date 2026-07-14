@@ -18,6 +18,14 @@ public final class ModItems {
             new AstralKeyItem(new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
     public static final Item ASTRAL_CELL = register("astral_cell",
             new AstralCellItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
+    public static final Item ASTRAL_THREAD = register("astral_thread",
+            new Item(new Item.Settings().rarity(Rarity.UNCOMMON)));
+    public static final Item LEY_CONDUIT = register("ley_conduit",
+            new BlockItem(ModBlocks.LEY_CONDUIT, new Item.Settings().rarity(Rarity.UNCOMMON)));
+    public static final Item RESONANCE_PYLON = register("resonance_pylon",
+            new BlockItem(ModBlocks.RESONANCE_PYLON, new Item.Settings().rarity(Rarity.RARE)));
+    public static final Item STARLIGHT_COLLECTOR = register("starlight_collector",
+            new BlockItem(ModBlocks.STARLIGHT_COLLECTOR, new Item.Settings().rarity(Rarity.RARE)));
 
     private ModItems() {
     }
@@ -31,6 +39,10 @@ public final class ModItems {
             entries.add(ASTRAL_ANCHOR);
             entries.add(ASTRAL_KEY);
             entries.add(ASTRAL_CELL);
+            entries.add(ASTRAL_THREAD);
+            entries.add(LEY_CONDUIT);
+            entries.add(RESONANCE_PYLON);
+            entries.add(STARLIGHT_COLLECTOR);
         });
     }
 }
