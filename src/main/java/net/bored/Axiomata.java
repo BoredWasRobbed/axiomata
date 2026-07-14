@@ -3,7 +3,7 @@ package net.bored;
 import net.bored.content.ModBlockEntities;
 import net.bored.content.ModBlocks;
 import net.bored.content.ModItems;
-import net.bored.ritual.RitualRegistry;
+import net.bored.content.ModScreenHandlers;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -18,8 +18,8 @@ public class Axiomata implements ModInitializer {
         ModBlocks.register();
         ModItems.register();
         ModBlockEntities.register();
-        RitualRegistry.bootstrap();
-        LOGGER.info("Axiomata has inscribed {} ritual axioms", RitualRegistry.all().size());
+        ModScreenHandlers.register();
+        LOGGER.info("Axiomata opened the astral archive");
     }
 
     public static Identifier id(String path) {

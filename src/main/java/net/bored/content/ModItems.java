@@ -1,6 +1,8 @@
 package net.bored.content;
 
 import net.bored.Axiomata;
+import net.bored.item.AstralCellItem;
+import net.bored.item.AstralKeyItem;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -10,14 +12,12 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Rarity;
 
 public final class ModItems {
-    public static final Item RITUAL_NEXUS = register("ritual_nexus",
-            new BlockItem(ModBlocks.RITUAL_NEXUS, new Item.Settings().rarity(Rarity.EPIC)));
-    public static final Item OFFERING_PLINTH = register("offering_plinth",
-            new BlockItem(ModBlocks.OFFERING_PLINTH, new Item.Settings().rarity(Rarity.UNCOMMON)));
-    public static final Item RUNE_MARK = register("rune_mark",
-            new BlockItem(ModBlocks.RUNE_MARK, new Item.Settings()));
-    public static final Item RESONANCE_TUNER = register("resonance_tuner",
-            new Item(new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
+    public static final Item ASTRAL_ANCHOR = register("astral_anchor",
+            new BlockItem(ModBlocks.ASTRAL_ANCHOR, new Item.Settings().rarity(Rarity.EPIC)));
+    public static final Item ASTRAL_KEY = register("astral_key",
+            new AstralKeyItem(new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
+    public static final Item ASTRAL_CELL = register("astral_cell",
+            new AstralCellItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
 
     private ModItems() {
     }
@@ -28,10 +28,9 @@ public final class ModItems {
 
     public static void register() {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> {
-            entries.add(RITUAL_NEXUS);
-            entries.add(OFFERING_PLINTH);
-            entries.add(RUNE_MARK);
-            entries.add(RESONANCE_TUNER);
+            entries.add(ASTRAL_ANCHOR);
+            entries.add(ASTRAL_KEY);
+            entries.add(ASTRAL_CELL);
         });
     }
 }

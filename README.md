@@ -1,8 +1,8 @@
 # Axiomata
 
-Axiomata is a renderer-first ritual magic mod for Fabric 1.20.1. Instead of painted blocks or authored models, its ritual apparatus is drawn at runtime from animated lines: rotating geometric proofs, orbiting runes, energy paths, wireframe plinths, and a double helix that grows as an axiom resolves.
+Axiomata is a renderer-first storage mod for Fabric 1.20.1. It treats storage as a place rather than a container: every archive is a persistent constellation in the astral plane, and physical anchors are only doors into it.
 
-The mod ships no custom in-world textures. Block-entity renderers create every placed structure procedurally; inventory icons are small JSON aliases to vanilla item models. The existing PNG is used only as the mod-list icon.
+There are no custom in-world textures or authored block models. The anchor, its aperture, and the archive interface are assembled at runtime from procedural geometry and UI primitives. Inventory icons reuse vanilla item models; the PNG is only the mod-list icon.
 
 ## Requirements
 
@@ -11,56 +11,53 @@ The mod ships no custom in-world textures. Block-entity renderers create every p
 - Fabric API 0.92.9+1.20.1
 - Java 17 to play
 
-## Building a ritual
+## The storage loop
 
-Place the blocks on one level in this exact footprint. North is at the top:
+1. Craft and place an **Astral Anchor**. It creates a new archive with 54 slots.
+2. Right-click the anchor to open its textureless, paged interface. Shift-clicking works in both directions.
+3. Use an **Astral Cell** on the anchor to permanently unfold one more 54-slot page. Each network supports four pages, or 216 slots total.
+4. Use an **Astral Key** on the anchor to attune it. Right-click the key anywhere—even in another dimension—to open the same archive.
+5. Break, move, or replace the anchor freely. Its contents remain in world-level astral storage rather than dropping or disappearing.
 
-```text
-              P north
+## Linking anchors and keys
 
-         R NW         R NE
+- Use a key normally on an anchor to copy that anchor's constellation into the key.
+- Sneak-use an attuned key on an anchor to rebind the anchor to the key's archive.
+- Right-click with an attuned key in the air to open its archive remotely.
+- Sneak-right-click with the key in the air to erase its attunement.
 
-P west          N           P east
+Multiple anchors and keys can point at the same archive. Each archive has a short constellation code in the interface and key tooltip, making it possible to verify links without exposing the full UUID.
 
-         R SW         R SE
+## Visual language
 
-              P south
-```
+The anchor communicates real state instead of playing a fixed animation:
 
-`N` is the Ritual Nexus, each `P` is an Offering Plinth three blocks from it, and each `R` is a Rune Mark one block diagonally from it.
+- archive identity determines its color and deterministic constellation;
+- the bright base arc shows occupied-slot ratio;
+- one orbiting crystal appears for every unlocked page;
+- access wakes six transfer filaments and moving matter motes;
+- the aperture breathes, counter-rotates, and gains intensity while active;
+- a textureless inventory screen uses the same network color, constellation, and page indicators.
 
-1. Put one offering on each plinth by right-clicking it. Use an empty hand to take the offering back.
-2. Right-click a rune with the Resonance Tuner to advance its value from 0 through 7. Sneak-right-click to go backward.
-3. Right-click the nexus with an empty hand, or sneak-right-click with the tuner, to inspect the sequence and offerings.
-4. Right-click the nexus with the tuner to resolve the matching axiom.
+See [docs/RENDERING.md](docs/RENDERING.md) for the renderer breakdown and [docs/STORAGE.md](docs/STORAGE.md) for persistence and linking internals.
 
-Rune order is `NW → NE → SE → SW`. Plinth order is `north → east → south → west`; offerings themselves match in any order.
+## Persistence guarantees
 
-## Known axioms
-
-| Axiom | Runes | Four offerings | Result |
-| --- | --- | --- | --- |
-| Material Concordance | `0, 2, 4, 6` | iron ingot, copper ingot, redstone, quartz | Transmutes the set into four gold ingots. |
-| Verdant Recursion | `1, 3, 5, 7` | wheat seeds, bone meal, glow berries, emerald | Grows fertilizable blocks in a 15×6×15 region. |
-| Aegis Equation | `7, 0, 7, 0` | shield, iron ingot, amethyst shard, ghast tear | Grants nearby players Resistance II, Absorption III, and Fire Resistance for 150 seconds. |
-| Tempest Postulate | `3, 6, 1, 4` | copper ingot, feather, redstone, prismarine shard | Begins a thunderstorm and calls lightning onto up to six nearby hostiles. |
-| Astral Translation | `6, 6, 2, 2` | ender pearl, chorus fruit, compass, amethyst shard | Moves the caster 48 blocks forward to the surface. |
-
-Every activation is server-authoritative. The complete structure and all four offerings are checked before anything is consumed; active rituals persist across saves and enter a four-second stabilization cooldown when they finish.
-
-## Crafting
-
-All four mod items have ordinary crafting recipes and appear in the Functional Blocks creative tab. Recipe viewers can discover them normally.
+- Storage is saved once per world in `axiomata_astral_storage` persistent state.
+- The Overworld owns the data, so access remains consistent across dimensions.
+- Block entities save only their network link and display metrics—not item contents.
+- Removing the last known anchor does not garbage-collect an archive. An attuned key can always recover it.
+- Capacity only increases. Cells cannot strand items by shrinking a vault.
 
 ## Development
 
-The current Loom build runtime requires Java 21, while compilation deliberately targets Java 17 for Minecraft 1.20.1 compatibility:
+The current Loom plugin uses Java 21 as its build runtime while producing Java 17-compatible mod bytecode:
 
 ```bash
 ./gradlew build
 ```
 
-The distributable is generated at `build/libs/axiomata-0.1.0.jar`. Renderer architecture and extension notes are in [docs/RENDERING.md](docs/RENDERING.md).
+The distributable is generated at `build/libs/axiomata-0.2.0.jar`.
 
 ## License
 

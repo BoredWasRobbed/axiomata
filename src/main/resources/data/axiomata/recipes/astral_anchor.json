@@ -10,11 +10,11 @@
     "A": { "item": "minecraft:amethyst_shard" },
     "E": { "item": "minecraft:ender_eye" },
     "O": { "item": "minecraft:obsidian" },
-    "C": { "item": "minecraft:crying_obsidian" },
-    "R": { "item": "minecraft:redstone_block" }
+    "C": { "item": "minecraft:ender_chest" },
+    "R": { "item": "minecraft:crying_obsidian" }
   },
   "result": {
-    "item": "axiomata:ritual_nexus"
+    "item": "axiomata:astral_anchor"
   },
   "show_notification": true
 }

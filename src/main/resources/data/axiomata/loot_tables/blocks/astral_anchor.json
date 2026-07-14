@@ -2,7 +2,7 @@
   "type": "minecraft:block",
   "pools": [{
     "rolls": 1,
-    "entries": [{ "type": "minecraft:item", "name": "axiomata:offering_plinth" }],
+    "entries": [{ "type": "minecraft:item", "name": "axiomata:astral_anchor" }],
     "conditions": [{ "condition": "minecraft:survives_explosion" }]
   }]
 }

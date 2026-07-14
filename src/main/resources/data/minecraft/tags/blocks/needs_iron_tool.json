@@ -1,7 +1,6 @@
 {
   "replace": false,
   "values": [
-    "axiomata:ritual_nexus",
-    "axiomata:offering_plinth"
+    "axiomata:astral_anchor"
   ]
 }

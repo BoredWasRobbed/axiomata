@@ -1,30 +1,27 @@
 # Renderer architecture
 
-Axiomata deliberately separates simulation from presentation. Ritual matching, inventory consumption, timers, and effects live in the common source set. The client source set reads only synchronized block-entity state and turns it into geometry.
+Axiomata has no custom in-world texture atlas entries and no baked world geometry. Both the placed anchor and its storage interface are composed at runtime.
 
-## Geometry pipeline
+## Astral Anchor
 
-`RenderPrimitives` is the renderer vocabulary. It emits line pairs into Minecraft's line render layer and supports segments, circles, eight glyph alphabets, and wireframe boxes. There are no baked in-world models and no texture sampling in this path.
+`RenderPrimitives` emits colored line pairs into Minecraft's line render layer. It provides segments, full and partial circles, wire boxes, octahedral storage cells, three-axis stars, and cubic Bézier paths.
 
-- `RitualNexusRenderer` composes a wireframe base, concentric proof circles, two independently rotating and tilted rings, eight orbiting glyphs, cardinal energy paths, and a two-strand rising helix. Ritual progress controls height and radius; the definition supplies color.
-- `RuneMarkRenderer` draws a pair of floor circles and one procedurally defined symbol. Charged marks pulse while their nexus is resolving.
-- `OfferingPlinthRenderer` draws three nested wireframe prisms and a hovering ring. Its only conventional rendering is the offered vanilla `ItemStack`, so players can identify what they placed.
+`AstralAnchorRenderer` composes those primitives into several stateful layers:
 
-The nexus renderer opts out of the normal one-block culling box because its cardinal paths reach the plinths three blocks away.
+- an octagonal physical base, radial braces, counter-rotating circles, and an occupancy arc;
+- a vertical astral aperture with three breathing rings, twelve radial gates, and a separate pair of tilted armillary rings;
+- one orbiting octahedral cell per unlocked 54-slot page;
+- fourteen deterministic stars derived from the archive UUID, connected into a faint constellation canopy;
+- six cubic transfer filaments and moving three-axis motes that appear after archive access.
 
-## Synchronization
+Archive identity generates the palette and constellation seed. Capacity, occupied-slot ratio, and the last-access timestamp are synchronized display metrics, so visual changes describe actual storage state.
 
-`SyncedBlockEntity` centralizes update packets and initial chunk NBT. The nexus syncs active ritual ID, progress, duration, color, cooldown, and caster UUID. Plinths sync one inventory stack, while rune marks sync a three-bit rune value and charged flag.
+## Astral Archive screen
 
-The server sends ritual progress every five ticks. Client renderers interpolate with tick delta, keeping animation smooth without a packet every tick.
+`AstralStorageScreen` extends `HandledScreen` but never samples a GUI texture. It draws panels, borders, 90 slot wells, stars, dotted constellation paths, page markers, labels, and shadows with `DrawContext` primitives.
 
-## Adding an axiom
+The screen color comes from the same archive UUID as the anchor. The footer also states whether the access path is an anchor or portable key and prints the short constellation code.
 
-Add one `RitualDefinition` in `RitualRegistry.bootstrap()` with:
+## Network cost
 
-1. A unique identifier and translation key.
-2. Four rune integers in `NW, NE, SE, SW` order.
-3. Exactly four item requirements.
-4. A duration, RGB color, and server-side effect.
-
-The matching engine treats offerings as an unordered multiset and handles duplicate requirements correctly. No client renderer changes are necessary; new definitions automatically drive nexus color and timing.
+The anchor updates occupancy metrics every ten server ticks and sends block-entity updates only when those metrics change. Last-access time is sent as a timestamp, letting the client animate locally without a countdown packet every tick. Screen contents use vanilla `ScreenHandler` slot synchronization.

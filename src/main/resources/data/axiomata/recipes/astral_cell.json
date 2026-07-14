@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AEA",
+    "SCS",
+    "AOA"
+  ],
+  "key": {
+    "A": { "item": "minecraft:amethyst_shard" },
+    "E": { "item": "minecraft:echo_shard" },
+    "S": { "item": "minecraft:shulker_shell" },
+    "C": { "item": "minecraft:end_crystal" },
+    "O": { "item": "minecraft:obsidian" }
+  },
+  "result": {
+    "item": "axiomata:astral_cell"
+  },
+  "show_notification": true
+}
